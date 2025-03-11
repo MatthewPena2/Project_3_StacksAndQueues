@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.util.Random;
 import QueuePackage.*;
 import Queue.SimulationEventQueue;
+import java.util.*;
 
 /**
  * A Thread for the Bank simulation using queues
@@ -61,29 +62,42 @@ public class BankActionThread extends ActionThread
     private Random sharedRandom;
     
     
-    public void init() 
+    public void init()
     {
         theEvents = new SimulationEventQueue();
         sharedRandom = new Random();
         myLine = new BankLine();
 
         myReport = new Report(myLine);
-        myTeller = new Teller("Fred",maxForService, theEvents, sharedRandom, myLine, myReport);       
+        myTeller = new Teller("Fred",maxForService, theEvents, sharedRandom, myLine, myReport);
         myCG = new CustomerGenerator(maxForInterval, theEvents, sharedRandom, myLine );
         lastEventReport = "No events have been processed";
-        
+
         SimulationEvent next = theEvents.peek();
         if(next != null)
             nextEventAction = next.getDescription();
         else
             nextEventAction = "No events to process";
-        
+
     }
         
 
     public void executeApplication()
     {
         //ADD CODE HERE TO RUN THE EVENT SIMULATION
+
+        while(!theEvents.isEmpty() && theEvents.getCurrentTime() < stopSimulationAt){
+            SimulationEvent thisEvent = theEvents.remove();
+            thisEvent.process();
+            lastEventReport = thisEvent.getPostActionReport();
+            SimulationEvent nextEvent = theEvents.peek();
+            if(nextEvent != null){
+                nextEventAction = nextEvent.getDescription();
+            }
+            myReport.updateTime(theEvents.getCurrentTime());
+            animationPause();
+        }
+
     }
     
 
