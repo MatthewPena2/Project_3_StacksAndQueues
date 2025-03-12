@@ -1,3 +1,4 @@
+package Stacks;
 
 import java.util.*;
 
@@ -81,6 +82,48 @@ public class StackSort {
 
         
     // ADD CODE HERE TO SORT THE ARRAY USING TWO STACKS
+        VectorStack<Integer> lowerValues = new VectorStack<>();
+        VectorStack<Integer> upperValues = new VectorStack<>();
+
+        for(int j = 0; j < data.length; j++) {
+            boolean Lfound = false;
+            while(!Lfound) {
+                if(lowerValues.isEmpty()) {
+                    lowerValues.push(data[j]);
+                    Lfound = true;
+                }
+                else if(!upperValues.isEmpty() && upperValues.peek() < data[j]) {
+                    boolean Rfound = false;
+                    while(!Rfound){
+                        if(upperValues.isEmpty()) {
+                            upperValues.push(data[j]);
+                            Rfound = true;
+                        }
+                        else if(upperValues.peek() < data[j]) {
+                            lowerValues.push(upperValues.pop());
+                        }else{
+                            upperValues.push(data[j]);
+                            Rfound = true;
+                        }
+                    }
+                    Lfound = true;
+                }
+                else if(lowerValues.peek() > data[j]) {
+                    upperValues.push(lowerValues.pop());
+                }else{
+                    lowerValues.push(data[j]);
+                    Lfound = true;
+                }
+            }
+        }
+
+        while(!lowerValues.isEmpty()) {
+            upperValues.push(lowerValues.pop());
+        }
+
+        for(int i = 0; i < result.length; i++) {
+            result[i] = upperValues.pop();
+        }
 
         return result;
 
